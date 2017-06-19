@@ -4,16 +4,17 @@ pozaNava.src="millennium_falcon.png";
 function NavaSpatiala(){
 	this.x = 0;
 	this.y = 0;
-	this.vitezaX = 0;
-	this.vitezaY = 0;
+	this.vx = 0;
+	this.vy = 0;
 	this.v = 0;
-	this.unghi = 0;	
-	this.stareNava = {vitezaMaxima:100,
-						dunghi:0.03,
-						acceleratie:10};
+	this.unghiRaza = 0;
+	this.timpLansare = 0;
 	
-	this.actualizareNava = function(dt,beta,gamma){
-                this.unghi =gamma/Math.PI;
+	
+	this.stareNava = {vitezaMaxima:100,dunghiRaza:0.03,acceleratie:10,incetinireNava:100};
+	
+	this.update = function(dt,beta,gamma){
+                this.unghiRaza =gamma/Math.PI;
 		var mergeFata=false;
                 var mergeSpate=false;
                 var directie=beta;
@@ -29,25 +30,33 @@ function NavaSpatiala(){
 				this.v = -this.stareNava.vitezaMaxima;
                             mergeSpate=true;
 		}
-                if(mergeFata==true || mergeSpate==true){
-	        this.v *= 0.99;
-		this.vitezaX = this.v * Math.cos(this.unghi);
-		this.vitezaY = this.v * Math.sin(this.unghi);
+        if(mergeFata==true || mergeSpate==true){
+	    this.v *= 0.99;
+		this.vx = this.v * Math.cos(this.unghiRaza);
+		this.vy = this.v * Math.sin(this.unghiRaza);		
+		this.x += this.vx * dt;
+		this.y += this.vy * dt;          
+        }              
+        var timp = utils.getTime();
+		if(foc==true && timp - this.timpLansare >= this.stareNava.incetinireNava){
+			racheta.push({
+				x:this.x,
+				y:this.y,
+				unghiRaza:this.unghiRaza,
+				v:250
+			});
+			this.timpLansare = timp;
+                        foc=false;
+		}
 		
-		this.x += this.vitezaX * dt;
-		this.y += this.vitezaY * dt;          
-            
-            
-            }        
-              
-           };
+	};
 	
-	this.contextNava = function(ctx){	
+	this.render = function(ctx){	
           ctx.clearRect(0, 0, 800, 800);      
          ctx.save();
-         var pointerLength = 25;
+         var lungime = 25;
 	ctx.translate(this.x, this.y);
-	ctx.rotate(Math.PI/180 * (this.unghi*50));
+	ctx.rotate(Math.PI/180 * (this.unghiRaza*50));
 	ctx.drawImage(pozaNava, -(pozaNava.width/2), -(pozaNava.height/2));   
 	ctx.restore();
                 
